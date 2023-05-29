@@ -43,6 +43,9 @@ class AdaptiveAdditionPredictor(nn.Module):
         self.hidden = nn.Linear(hidden_size * 4, hidden_size * 4)
         self.dropout = nn.Dropout(dropout_rate)
 
+        self.pred_v = nn.Linear(hidden_size * 4, 1)
+        self.pred_hidden = nn.Linear(hidden_size * 4, hidden_size * 4)
+
     def forward(self, query, context, mask):
         '''
         :param query: [c, e]
@@ -63,7 +66,7 @@ class AdaptiveAdditionPredictor(nn.Module):
         g = torch.matmul(scores, context_).squeeze(2)  # [b, c, e]
         query = query.unsqueeze(0).expand_as(g)  # [b, c, e]
 
-        pred = self.v(torch.tanh(self.hidden(torch.cat([query, g, torch.abs(query - g), query * g], dim=-1)))).squeeze(-1)  # [b, c]
+        pred = self.pred_v(torch.tanh(self.pred_hidden(torch.cat([query, g, torch.abs(query - g), query * g], dim=-1)))).squeeze(-1)  # [b, c]
         return pred
 
 

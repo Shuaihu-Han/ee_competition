@@ -32,11 +32,22 @@ class Framework(object):
         print("The number of evaluating instances:", len(dev_loader.dataset))
 
         bert_params = list(map(id, model.bert.parameters()))
+        # type_params = list(map(id, model.type_cls.parameters()))
+        type_params = filter(lambda p: id(p) not in bert_params, model.type_cls.parameters())
 
-        other_params = filter(lambda p: id(p) not in bert_params, model.parameters())
-        optimizer_grouped_parameters = [{'params': model.bert.parameters()}, {'params': other_params, 'lr': config.lr_task}]
+        trigger_params = filter(lambda p: (id(p) not in bert_params) and (id(p) not in type_params), model.trigger_rec.parameters())
+        arg_params = filter(lambda p: (id(p) not in bert_params) and (id(p) not in type_params) and (id(p) not in trigger_params), model.args_rec.parameters())
+        # arg_params = list(map(id, model.args_rec.parameters()))
+        # other_params = filter(lambda p: id(p) not in bert_params, model.parameters())
 
-        optimizer = AdamW(optimizer_grouped_parameters, lr=config.lr_bert, correct_bias=False)
+        optimizer_grouped_parameters = [{'params': model.bert.parameters(), 'lr': config.lr_bert}, 
+                                        {'params': type_params, 'lr': config.lr_type},
+                                        {'params': trigger_params, 'lr': config.lr_trigger},
+                                        {'params': arg_params, 'lr': config.lr_argument}]
+        # optimizer_grouped_parameters = [{'params': model.bert.parameters(), 'lr': config.lr_bert}, 
+        #                                 {'params': other_params, 'lr': config.lr_type}]
+
+        optimizer = AdamW(optimizer_grouped_parameters, correct_bias=False)
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=train_steps * config.warmup, num_training_steps=train_steps)
 
         if config.fp16:

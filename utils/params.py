@@ -44,7 +44,10 @@ def parse_args():
 
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
     parser.add_argument("--lr_bert", type=float, default=2e-5, help="Learning rate for BERT.")
-    parser.add_argument("--lr_task", type=float, default=1e-4, help="Learning rate for task layers.")
+    # parser.add_argument("--lr_task", type=float, default=1e-4, help="Learning rate for task layers.")
+    parser.add_argument("--lr_type", type=float, default=4e-5, help="Learning rate for task layers.")
+    parser.add_argument("--lr_trigger", type=float, default=6e-5, help="Learning rate for task layers.")
+    parser.add_argument("--lr_argument", type=float, default=1e-4, help="Learning rate for task layers.")
     parser.add_argument("--warmup", type=float, default=0.1, help="Warm up value.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch_size.")
     parser.add_argument("--epochs_num", type=int, default=50, help="Number of epochs.")

@@ -16,9 +16,9 @@ class TypeCls(nn.Module):
         for key in self.config.ty_args:
             type_token = self.tokenizer(key, return_tensors='pt')
             if self.type_emb == None:
-                self.type_emb = self.bert(**type_token)[0].squeeze(0).squeeze(0).mean(0)
+                self.type_emb = self.bert(**type_token)[0].squeeze(0).squeeze(0)[1:-1].mean(0)
             else:
-                self.type_emb = torch.cat((self.type_emb, self.bert(**type_token)[0].squeeze(0).mean(0)), dim=0)
+                self.type_emb = torch.cat((self.type_emb, self.bert(**type_token)[0].squeeze(0)[1:-1].mean(0)), dim=0)
 
         self.type_emb = self.type_emb.reshape(config.type_num, -1) 
         self.type_emb = nn.Embedding(config.type_num, config.hidden_size,_weight=self.type_emb)
@@ -41,6 +41,11 @@ class TriggerRec(nn.Module):
         self.tail_cls = nn.Linear(hidden_size, 1, bias=True)
 
         self.layer_norm = nn.LayerNorm(hidden_size)
+        self.reshape_cln = nn.Sequential(
+            nn.Linear(hidden_size * 3, hidden_size * 2),
+            nn.GELU(),
+            nn.Linear(hidden_size * 2, hidden_size),
+        )
         self.dropout = nn.Dropout(config.decoder_dropout)
         self.config = config
 
@@ -54,6 +59,9 @@ class TriggerRec(nn.Module):
         '''
 
         h_cln = self.ConditionIntegrator(text_emb, query_emb)
+        query_emb = torch.unsqueeze(query_emb, dim=1).repeat(1, self.config.seq_length, 1)
+        h_cln = torch.cat((h_cln, query_emb, text_emb), dim=2)
+        h_cln = self.reshape_cln(h_cln)
 
         h_cln = self.dropout(h_cln)
         h_sa = self.SA(h_cln, h_cln, h_cln, mask)
@@ -84,6 +92,11 @@ class ArgsRec(nn.Module):
         self.seq_len = seq_len
         self.dropout = nn.Dropout(config.decoder_dropout)
         self.layer_norm = nn.LayerNorm(hidden_size)
+        self.reshape_cln = nn.Sequential(
+            nn.Linear(hidden_size * 4, hidden_size * 2),
+            nn.GELU(),
+            nn.Linear(hidden_size * 2, hidden_size),
+        )
         self.config = config
 
     def forward(self, text_emb, relative_pos, trigger_mask, mask, type_emb):
@@ -106,6 +119,11 @@ class ArgsRec(nn.Module):
         trigger_emb = trigger_emb / 2
 
         h_cln = self.ConditionIntegrator(text_emb, trigger_emb)
+        trigger_emb = torch.unsqueeze(trigger_emb, dim=1).repeat(1, self.config.seq_length, 1)
+        expand_type_emb = torch.unsqueeze(type_emb, dim=1).repeat(1, self.config.seq_length, 1)
+        h_cln = torch.cat((h_cln, text_emb, trigger_emb, expand_type_emb), dim=2)
+        h_cln = self.reshape_cln(h_cln)
+
         h_cln = self.dropout(h_cln)
         h_sa = self.SA(h_cln, h_cln, h_cln, mask)
         h_sa = self.dropout(h_sa)

@@ -42,6 +42,9 @@ def main():
     model_weight = model_class.from_pretrained(config.model_name_or_path, from_tf=bool('.ckpt' in config.model_name_or_path), cache_dir=config.cache_dir if config.cache_dir else None)
 
     model = CasEE(config, model_weight, pos_emb_size=config.rp_size, tokenizer = tokenizer)
+    # for name,parameters in model.named_parameters():
+    #     print(name,':',parameters.size())
+
     framework = Framework(config, model)
 
     config.do_train = True
