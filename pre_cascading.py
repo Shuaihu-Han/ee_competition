@@ -19,7 +19,8 @@ def write(data, fn):
             f.write(line + '\n')
 
 
-TYPES = ['Experiment', 'Manoeuvre', 'Deploy', 'Support', 'Accident', 'Exhibit', 'Conflict', 'Injure']
+# TYPES = ['Experiment', 'Manoeuvre', 'Deploy', 'Support', 'Accident', 'Exhibit', 'Conflict', 'Injure']
+TYPES = ['试验', '演习', '部署', '支援', '意外事故', '展示', '冲突', '伤亡']
 
 
 def process(records):

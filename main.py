@@ -41,12 +41,12 @@ def main():
     tokenizer = tokenizer_class.from_pretrained(config.model_name_or_path, do_lower_case=config.do_lower_case, cache_dir=config.cache_dir if config.cache_dir else None)
     model_weight = model_class.from_pretrained(config.model_name_or_path, from_tf=bool('.ckpt' in config.model_name_or_path), cache_dir=config.cache_dir if config.cache_dir else None)
 
-    model = CasEE(config, model_weight, pos_emb_size=config.rp_size)
+    model = CasEE(config, model_weight, pos_emb_size=config.rp_size, tokenizer = tokenizer)
     framework = Framework(config, model)
 
     config.do_train = True
     config.do_eval = True
-    config.do_test = True
+    config.do_test = False
 
     if config.do_train:
         train_set = Data(task='train', fn=config.data_path + '/cascading_sampled/train.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)

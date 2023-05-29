@@ -2,14 +2,26 @@ from models.layers import *
 
 
 class TypeCls(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, tokenizer=None, bert = None):
         super(TypeCls, self).__init__()
-        self.type_emb = nn.Embedding(config.type_num, config.hidden_size)
+        self.type_emb = None
         self.register_buffer('type_indices', torch.arange(0, config.type_num, 1).long())
         self.dropout = nn.Dropout(config.decoder_dropout)
+        self.tokenizer = tokenizer
+        self.bert = bert
 
         self.config = config
         self.Predictor = AdaptiveAdditionPredictor(config.hidden_size, dropout_rate=config.decoder_dropout)
+
+        for key in self.config.ty_args:
+            type_token = self.tokenizer(key, return_tensors='pt')
+            if self.type_emb == None:
+                self.type_emb = self.bert(**type_token)[0].squeeze(0).squeeze(0).mean(0)
+            else:
+                self.type_emb = torch.cat((self.type_emb, self.bert(**type_token)[0].squeeze(0).mean(0)), dim=0)
+
+        self.type_emb = self.type_emb.reshape(config.type_num, -1) 
+        self.type_emb = nn.Embedding(config.type_num, config.hidden_size,_weight=self.type_emb)
 
     def forward(self, text_rep, mask):
         type_emb = self.type_emb(self.type_indices)
@@ -60,6 +72,7 @@ class ArgsRec(nn.Module):
         self.relative_pos_embed = nn.Embedding(seq_len * 2, pos_emb_size)
         self.ConditionIntegrator = ConditionalLayerNorm(hidden_size)
         self.SA = MultiHeadedAttention(hidden_size, heads_num=config.decoder_num_head, dropout=config.decoder_dropout)
+        self.SA_trigger_emb = MultiHeadedAttention(hidden_size, heads_num=config.decoder_num_head, dropout=config.decoder_dropout)
         self.hidden = nn.Linear(hidden_size + pos_emb_size, hidden_size)
 
         self.head_cls = nn.Linear(hidden_size, num_labels, bias=True)
@@ -83,6 +96,12 @@ class ArgsRec(nn.Module):
         :param type_emb: [b, e]
         :return:  [b, t, a], []
         '''
+
+        # trigger_emb = self.SA_trigger_emb(text_emb, text_emb, text_emb, mask)
+
+        # trigger_emb = torch.bmm(trigger_mask.unsqueeze(1).float(), trigger_emb).squeeze(1)  # [b, e]
+        # trigger_emb = trigger_emb / 2
+
         trigger_emb = torch.bmm(trigger_mask.unsqueeze(1).float(), text_emb).squeeze(1)  # [b, e]
         trigger_emb = trigger_emb / 2
 
@@ -112,15 +131,16 @@ class ArgsRec(nn.Module):
 
 
 class CasEE(nn.Module):
-    def __init__(self, config, model_weight, pos_emb_size):
+    def __init__(self, config, model_weight, pos_emb_size, tokenizer=None):
         super(CasEE, self).__init__()
         self.bert = model_weight
+        self.tokenizer = tokenizer
 
         self.config = config
         self.args_num = config.args_num
         self.text_seq_len = config.seq_length
 
-        self.type_cls = TypeCls(config)
+        self.type_cls = TypeCls(config, tokenizer = tokenizer, bert = self.bert)
         self.trigger_rec = TriggerRec(config, config.hidden_size)
         self.args_rec = ArgsRec(config, config.hidden_size, self.args_num, self.text_seq_len, pos_emb_size)
         self.dropout = nn.Dropout(config.decoder_dropout)
