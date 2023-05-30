@@ -51,15 +51,15 @@ def parse_args():
     parser.add_argument("--warmup", type=float, default=0.1, help="Warm up value.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch_size.")
     parser.add_argument("--epochs_num", type=int, default=50, help="Number of epochs.")
-    parser.add_argument("--report_steps", type=int, default=50, help="Specific steps to print prompt.")
+    parser.add_argument("--report_steps", type=int, default=200, help="Specific steps to print prompt.")
 
-    parser.add_argument("--weight_decay", type=float, default=0.0, help="Weight decay value")
+    parser.add_argument("--weight_decay", type=float, default=1e-5, help="Weight decay value")
     parser.add_argument("--dropout", type=float, default=0.1, help="Dropout on BERT")
     parser.add_argument("--decoder_dropout", type=float, default=0.3, help="Dropout on decoders")
 
     # Model options.
-    parser.add_argument("--w1", type=float, default=1.0)
-    parser.add_argument("--w2", type=float, default=1.0)
+    parser.add_argument("--w1", type=float, default=25.0)
+    parser.add_argument("--w2", type=float, default=5.0)
     parser.add_argument("--w3", type=float, default=1.0)
     parser.add_argument("--pow_0", type=int, default=1)
     parser.add_argument("--pow_1", type=int, default=1)
