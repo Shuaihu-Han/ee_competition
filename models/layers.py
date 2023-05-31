@@ -39,11 +39,20 @@ class ConditionalLayerNorm(nn.Module):
 class AdaptiveAdditionPredictor(nn.Module):
     def __init__(self, hidden_size, dropout_rate=0.0):
         super(AdaptiveAdditionPredictor, self).__init__()
-        self.v = nn.Linear(hidden_size * 4, 1)
+        # self.v = nn.Linear(hidden_size * 4, 1)
+        self.v = nn.Sequential(
+            nn.Linear(hidden_size * 4, hidden_size * 2),
+            nn.Tanh(),
+            nn.Linear(hidden_size * 2, 1),
+        )
         self.hidden = nn.Linear(hidden_size * 4, hidden_size * 4)
         self.dropout = nn.Dropout(dropout_rate)
 
-        self.pred_v = nn.Linear(hidden_size * 4, 1)
+        self.pred_v = nn.Sequential(
+            nn.Linear(hidden_size * 4, hidden_size * 2),
+            nn.Tanh(),
+            nn.Linear(hidden_size * 2, 1),
+        )
         self.pred_hidden = nn.Linear(hidden_size * 4, hidden_size * 4)
 
     def forward(self, query, context, mask):
