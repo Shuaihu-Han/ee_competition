@@ -71,7 +71,8 @@ class TriggerRec(nn.Module):
         inp = self.dropout(inp)
         p_s = torch.sigmoid(self.head_cls(inp))  # [b, t, 1]
         p_e = torch.sigmoid(self.tail_cls(inp))  # [b, t, 1]
-        return p_s, p_e, h_cln
+        # return p_s, p_e, h_cln
+        return p_s, p_e, text_emb
 
 
 class ArgsRec(nn.Module):
@@ -197,6 +198,8 @@ class CasEE(nn.Module):
         output_emb = outputs[0]
         p_type, type_emb = self.type_cls(output_emb, mask)
         p_type = p_type.pow(self.config.pow_0)
+        # p_type[p_type > self.config.threshold_0] = 1
+        # p_type[p_type <= self.config.threshold_0] = 0
         type_loss = self.loss_0(p_type, type_vec)
         type_loss = torch.sum(type_loss)
 
@@ -206,6 +209,13 @@ class CasEE(nn.Module):
         p_e = p_e.pow(self.config.pow_1)
         p_s = p_s.squeeze(-1)
         p_e = p_e.squeeze(-1)
+
+        # p_s[p_s > self.config.threshold_1] = 1
+        # p_s[p_s <= self.config.threshold_1] = 0
+
+        # p_e[p_e > self.config.threshold_1] = 1
+        # p_e[p_e <= self.config.threshold_1] = 0
+
         trigger_loss_s = self.loss_1(p_s, trigger_s_vec)
         trigger_loss_e = self.loss_1(p_e, trigger_e_vec)
         mask_t = mask.float()  # [b, t]
@@ -215,6 +225,13 @@ class CasEE(nn.Module):
         p_s, p_e, type_soft_constrain = self.args_rec(text_rep_type, relative_pos, trigger_mask, mask, type_rep)
         p_s = p_s.pow(self.config.pow_2)
         p_e = p_e.pow(self.config.pow_2)
+
+        # p_s[p_s > self.config.threshold_2] = 1
+        # p_s[p_s <= self.config.threshold_2] = 0
+
+        # p_e[p_e > self.config.threshold_2] = 1
+        # p_e[p_e <= self.config.threshold_2] = 0
+
         args_loss_s = self.loss_2(p_s, args_s_vec.transpose(1, 2))  # [b, t, l]
         args_loss_e = self.loss_2(p_e, args_e_vec.transpose(1, 2))
         mask_a = mask.unsqueeze(-1).expand_as(args_loss_s).float()  # [b, t, l]

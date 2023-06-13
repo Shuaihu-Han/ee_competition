@@ -118,7 +118,7 @@ class Framework(object):
 
             print('Evaluating...')
             c_ps, c_rs, c_fs, t_ps, t_rs, t_fs, a_ps, a_rs, a_fs = self.evaluate_with_oracle(self.config, self.model, dev_loader, self.config.device, self.config.ty_args_id, self.config.id_type)
-            f1_mean_all = (c_fs + t_fs + a_fs) / 3
+            f1_mean_all = (t_fs + a_fs) / 2
             print('Evaluate on all types:')
             print("Epoch id: {}, Type P: {:.3f}, Type R: {:.3f}, Type F: {:.3f}".format(epoch, c_ps, c_rs, c_fs))
             print("Epoch id: {}, Trigger P: {:.3f}, Trigger R: {:.3f}, Trigger F: {:.3f}".format(epoch, t_ps, t_rs, t_fs))
