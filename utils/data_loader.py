@@ -81,6 +81,8 @@ def get_relative_pos(start_idx, end_idx, length):
     return relative position 
     [start_idx, end_idx]
     '''
+    if start_idx == -1:
+        return [0] * length
     pos = list(range(-start_idx, 0)) + [0] * (end_idx - start_idx + 1) + list(range(1, length - end_idx))
     return pos
 
@@ -90,9 +92,13 @@ def get_trigger_mask(start_idx, end_idx, length):
     used to generate trigger mask, where the element of start/end postion is 1
     [000010100000]
     '''
+    if start_idx == -1:
+        return [1] * length
     mask = [0] * length
-    mask[start_idx] = 1
-    mask[end_idx] = 1
+    for i in range(start_idx, end_idx + 1):
+        mask[i] = 1
+    # mask[start_idx] = 1
+    # mask[end_idx] = 1
     return mask
 
 
@@ -305,7 +311,10 @@ class Data(Dataset):
         for i in range(len(self.data_ids)):
             trigger = triggers[i]
             index = data_index[i]
-            span = trigger[index]
+            if len(trigger) > 0:
+                span = trigger[index]
+            else:
+                span = [-2, -2]
             # plus 1 for additional <CLS> token
             pos = get_relative_pos(span[0] + 1, span[1] + 1 - 1, self.seq_len)
             pos = [p + self.seq_len for p in pos]
