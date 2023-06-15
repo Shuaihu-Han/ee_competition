@@ -2,19 +2,19 @@ import torch
 import numpy as np
 from utils.data_loader import get_relative_pos, get_trigger_mask
 
-TRI_LEN = 5
+TRI_LEN = 20
 ARG_LEN_DICT = {
-    'Equipment': 73,
-    'Result': 45,
-    'Date': 36,
-    'Location': 32,
-    'Militaryforce': 31,
-    'Subject': 33,
-    'Materials': 32,
-    'Content': 54,
-    'Quantity': 3,
-    'Area': 22,
-    'Object': 24
+    'Equipment': 73 * 2,
+    'Result': 45 * 2,
+    'Date': 36 * 2,
+    'Location': 32 * 2,
+    'Militaryforce': 31 * 2,
+    'Subject': 33 * 2,
+    'Materials': 32 * 2,
+    'Content': 54 * 2,
+    'Quantity': 3 * 10,
+    'Area': 22 * 2,
+    'Object': 24 * 2
 }
 
 
@@ -44,8 +44,8 @@ def extract_all_items_without_oracle(model, device, idx, content: str, token, se
             es = trigger_e[trigger_e >= i]
             if len(es) > 0:
                 e = es[0]
-                if e - i + 1 <= TRI_LEN:
-                    trigger_spans.append((i, e))
+                # if e - i + 1 <= TRI_LEN:
+                trigger_spans.append((i, e))
 
         for k, span in enumerate(trigger_spans):
             rp = get_relative_pos(span[0], span[1], seq_len)
@@ -76,9 +76,9 @@ def extract_all_items_without_oracle(model, device, idx, content: str, token, se
                     es = args_e[args_e >= j]
                     if len(es) > 0:
                         e = es[0]
-                        if e - j + 1 <= args_len_dict[i]:
-                            pred_arg = {'span': [int(j) - 1, int(e) + 1 - 1], 'word': content[int(j) - 1:int(e) + 1 - 1]}  # remove <CLS> token
-                            pred_args[id_args[i]].append(pred_arg)
+                        # if e - j + 1 <= args_len_dict[i]:
+                        pred_arg = {'span': [int(j) - 1, int(e) + 1 - 1], 'word': content[int(j) - 1:int(e) + 1 - 1]}  # remove <CLS> token
+                        pred_args[id_args[i]].append(pred_arg)
 
             pred_event_one['args'] = pred_args
             events_pred.append(pred_event_one)

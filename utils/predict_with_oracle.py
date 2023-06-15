@@ -39,7 +39,7 @@ def extract_specific_item_with_oracle(model, d_t, token, seg, mask, rp, tm, args
     return type_pred, trigger_spans, args_spans
 
 
-def predict_one(model, args, typ_truth, token, seg, mask, r_p, t_m, tri_truth, args_truth, ty_args_id, typ_oracle, tri_oracle):
+def predict_one(model, args, typ_truth, token, seg, mask, r_p, t_m, tri_truth, args_truth, ty_args_id, typ_oracle, trigger_index_flag, tri_oracle=None):
     type_pred, trigger_pred, args_pred = extract_specific_item_with_oracle(model, typ_oracle, token, seg, mask, r_p, t_m, args.args_num, args.threshold_0, args.threshold_1, args.threshold_2, args.threshold_3, args.threshold_4, ty_args_id)
     type_oracle = typ_oracle.item()
     type_truth = typ_truth.view(args.type_num).cpu().numpy().astype(int)
@@ -66,17 +66,17 @@ def predict_one(model, args, typ_truth, token, seg, mask, r_p, t_m, tri_truth, a
     args_candidates = ty_args_id[type_oracle]  # type constrain
     for i in args_candidates:
         typ = type_oracle
-        tri_sta = tri_oracle[0]
-        tri_end = tri_oracle[1]
+        # tri_sta = tri_oracle[0]
+        # tri_end = tri_oracle[1]
         arg_role = i
         for args_pred_one in args_pred[i]:
             arg_sta = args_pred_one[0]
             arg_end = args_pred_one[1]
-            args_pred_tuples.append((typ, arg_sta, arg_end, arg_role))
+            args_pred_tuples.append((typ, trigger_index_flag, arg_sta, arg_end, arg_role))
 
         for args_truth_one in args_truth[i]:
             arg_sta = args_truth_one[0]
             arg_end = args_truth_one[1]
-            args_truth_tuples.append((typ, arg_sta, arg_end, arg_role))
+            args_truth_tuples.append((typ, trigger_index_flag, arg_sta, arg_end, arg_role))
 
     return type_pred, type_truth, trigger_pred_tuples, trigger_truth_tuples, args_pred_tuples, args_truth_tuples

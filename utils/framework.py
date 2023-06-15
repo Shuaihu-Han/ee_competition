@@ -128,8 +128,12 @@ class Framework(object):
             if f1_mean_all > best_f1:
                 best_f1 = f1_mean_all
                 best_epoch = epoch
-                save_model(self.model, self.config.output_model_path)
+                # save_model(self.model, self.config.output_model_path)
             print("The Best F1 Is: {:.3f}, When Epoch Is: {}".format(best_f1, best_epoch))
+
+            if epoch % 10 == 0:
+                save_model(self.model, self.config.output_model_path)
+            
 
     def evaluate_with_oracle(self, config, model, dev_data_loader, device, ty_args_id, id2type):
         if hasattr(model, "module"):
@@ -152,8 +156,8 @@ class Framework(object):
             r_p = torch.LongTensor(r_p).to(device)
             t_m = torch.LongTensor(t_m).to(device)
 
-            tri_oracle = tri_truth[0][t_index[0]]
-            type_pred, type_truth, trigger_pred_tuples, trigger_truth_tuples, args_pred_tuples, args_truth_tuples = predict_one(model, config, typ_truth, token, seg, mask, r_p, t_m, tri_truth, args_truth, ty_args_id, typ_oracle, tri_oracle)
+            # tri_oracle = tri_truth[0][t_index[0]]
+            type_pred, type_truth, trigger_pred_tuples, trigger_truth_tuples, args_pred_tuples, args_truth_tuples = predict_one(model, config, typ_truth, token, seg, mask, r_p, t_m, tri_truth, args_truth, ty_args_id, typ_oracle, i, None)
 
             idx = idx[0]
             # collect type predictions

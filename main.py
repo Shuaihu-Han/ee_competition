@@ -47,7 +47,7 @@ def main():
 
     framework = Framework(config, model)
 
-    config.do_train = True
+    config.do_train = False
     config.do_eval = True
     config.do_test = False
 
