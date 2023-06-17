@@ -128,11 +128,11 @@ class Framework(object):
             if f1_mean_all > best_f1:
                 best_f1 = f1_mean_all
                 best_epoch = epoch
-                # save_model(self.model, self.config.output_model_path)
+                save_model(self.model, self.config.output_model_path)
             print("The Best F1 Is: {:.3f}, When Epoch Is: {}".format(best_f1, best_epoch))
 
-            if epoch % 10 == 0:
-                save_model(self.model, self.config.output_model_path)
+            # if epoch % 10 == 0:
+            #     save_model(self.model, self.config.output_model_path)
             
 
     def evaluate_with_oracle(self, config, model, dev_data_loader, device, ty_args_id, id2type):

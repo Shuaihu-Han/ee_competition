@@ -25,6 +25,7 @@ def parse_args():
     # Path options.
     parser.add_argument("--data_path", type=str, default='datasets/FewFC', help="Path of the dataset.")
     parser.add_argument("--test_path", type=str, default='datasets/FewFC/data/test.json', help="Path of the testset.")
+    parser.add_argument("--dev_path", type=str, default='datasets/FewFC/data/dev.json', help="Path of the testset.")
 
     parser.add_argument("--do_train", default=True, type=str2bool)
     parser.add_argument("--do_eval", default=True, type=str2bool)

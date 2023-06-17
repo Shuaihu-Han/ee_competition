@@ -1,6 +1,34 @@
 from models.layers import *
 
 
+# class TypeCls(nn.Module):
+#     def __init__(self, config, tokenizer=None, bert = None):
+#         super(TypeCls, self).__init__()
+#         self.type_emb = None
+#         self.register_buffer('type_indices', torch.arange(0, config.type_num, 1).long())
+#         self.dropout = nn.Dropout(config.decoder_dropout)
+#         self.tokenizer = tokenizer
+#         self.bert = bert
+
+#         self.config = config
+#         self.Predictor = AdaptiveAdditionPredictor(config.hidden_size, dropout_rate=config.decoder_dropout)
+
+#         for key in self.config.ty_args:
+#             type_token = self.tokenizer(key, return_tensors='pt')
+#             if self.type_emb == None:
+#                 self.type_emb = self.bert(**type_token)[0].squeeze(0).squeeze(0)[1:-1].mean(0)
+#             else:
+#                 self.type_emb = torch.cat((self.type_emb, self.bert(**type_token)[0].squeeze(0)[1:-1].mean(0)), dim=0)
+
+#         self.type_emb = self.type_emb.reshape(config.type_num, -1) 
+#         self.type_emb = nn.Embedding(config.type_num, config.hidden_size,_weight=self.type_emb)
+
+#     def forward(self, text_rep, mask):
+#         type_emb = self.type_emb(self.type_indices)
+#         pred = self.Predictor(type_emb, text_rep, mask)  # [b, c]
+#         p_type = torch.sigmoid(pred)
+#         return p_type, type_emb
+
 class TypeCls(nn.Module):
     def __init__(self, config, tokenizer=None, bert = None):
         super(TypeCls, self).__init__()

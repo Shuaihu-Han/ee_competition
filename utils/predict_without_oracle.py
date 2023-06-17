@@ -69,7 +69,7 @@ def extract_all_items_without_oracle(model, device, idx, content: str, token, se
 
             args_candidates = ty_args_id[type_pred_one]
             for i in args_candidates:
-                pred_args[id_args[i]] = []
+                # pred_args[id_args[i]] = []
                 args_s = np.where(p_s[i] > threshold_3)[0]
                 args_e = np.where(p_e[i] > threshold_4)[0]
                 for j in args_s:
@@ -78,8 +78,10 @@ def extract_all_items_without_oracle(model, device, idx, content: str, token, se
                         e = es[0]
                         # if e - j + 1 <= args_len_dict[i]:
                         pred_arg = {'span': [int(j) - 1, int(e) + 1 - 1], 'word': content[int(j) - 1:int(e) + 1 - 1]}  # remove <CLS> token
+                        pred_args[id_args[i]] = pred_args.get(id_args[i], [])
                         pred_args[id_args[i]].append(pred_arg)
 
+            # if len(pred_args) > 0:
             pred_event_one['args'] = pred_args
             events_pred.append(pred_event_one)
     result['events'] = events_pred

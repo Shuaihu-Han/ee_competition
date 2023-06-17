@@ -44,10 +44,11 @@ for i, item in enumerate(records):
         if maxlen < length:
             maxlen = length
             id = item['id']
+            
 
 print(maxlen)
 print(id)
 
-a = Counter(lena)
-for k, v in a.items():
-    print(k, v)
+# a = Counter(lena)
+# for k, v in a.items():
+#     print(k, v)
