@@ -47,10 +47,10 @@ def main():
 
     framework = Framework(config, model)
 
-    config.do_train = False
-    config.do_eval = False
-    config.do_test = True
-    config.test_path = 'datasets/FewFC/data/test.json'
+    config.do_train = True
+    config.do_eval = True
+    config.do_test = False
+    config.test_path = 'datasets/FewFC/data/dev.json'
 
     if config.do_train:
         train_set = Data(task='train', fn=config.data_path + '/cascading_sampled/train.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
@@ -82,13 +82,13 @@ def main():
         print("Test set evaluation with oracle.")
         dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_dev)
-        # c_ps, c_rs, c_fs, t_ps, t_rs, t_fs, a_ps, a_rs, a_fs = framework.evaluate_with_oracle(config, model, dev_loader, config.device, config.ty_args_id, config.id_type)
-        # f1_mean_all = (t_fs + a_fs) / 2
-        # print('Evaluate on all types:')
-        # print("Type P: {:.3f}, Type R: {:.3f}, Type F: {:.3f}".format(c_ps, c_rs, c_fs))
-        # print("Trigger P: {:.3f}, Trigger R: {:.3f}, Trigger F: {:.3f}".format(t_ps, t_rs, t_fs))
-        # print("Args P: {:.3f}, Args R: {:.3f}, Args F: {:.3f}".format(a_ps, a_rs, a_fs))
-        # print("F1 Mean All: {:.3f}".format(f1_mean_all))
+        c_ps, c_rs, c_fs, t_ps, t_rs, t_fs, a_ps, a_rs, a_fs = framework.evaluate_with_oracle(config, model, dev_loader, config.device, config.ty_args_id, config.id_type)
+        f1_mean_all = (t_fs + a_fs) / 2
+        print('Evaluate on all types:')
+        print("Type P: {:.3f}, Type R: {:.3f}, Type F: {:.3f}".format(c_ps, c_rs, c_fs))
+        print("Trigger P: {:.3f}, Trigger R: {:.3f}, Trigger F: {:.3f}".format(t_ps, t_rs, t_fs))
+        print("Args P: {:.3f}, Args R: {:.3f}, Args F: {:.3f}".format(a_ps, a_rs, a_fs))
+        print("F1 Mean All: {:.3f}".format(f1_mean_all))
 
         # Evaluation on test set given oracle predictions.
         print("Test set evaluation.")

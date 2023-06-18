@@ -50,12 +50,13 @@ class TypeCls(nn.Module):
 
         self.type_emb = self.type_emb.reshape(config.type_num, -1) 
         self.type_emb = nn.Embedding(config.type_num, config.hidden_size,_weight=self.type_emb)
+        self.p_type = torch.ones(config.batch_size, config.type_num, device=config.device)
 
     def forward(self, text_rep, mask):
         type_emb = self.type_emb(self.type_indices)
-        pred = self.Predictor(type_emb, text_rep, mask)  # [b, c]
-        p_type = torch.sigmoid(pred)
-        return p_type, type_emb
+        # pred = self.Predictor(type_emb, text_rep, mask)  # [b, c]
+        # p_type = torch.sigmoid(pred)
+        return self.p_type[:mask.shape[0]], type_emb
 
 
 class TriggerRec(nn.Module):
@@ -272,7 +273,8 @@ class CasEE(nn.Module):
         type_loss = self.config.w1 * type_loss
         trigger_loss = self.config.w2 * trigger_loss
         args_loss = self.config.w3 * args_loss
-        loss = type_loss + trigger_loss + args_loss
+        # loss = type_loss + trigger_loss + args_loss
+        loss = trigger_loss + args_loss
         return loss, type_loss, trigger_loss, args_loss
 
     def plm(self, tokens, segment, mask):

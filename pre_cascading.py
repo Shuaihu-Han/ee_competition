@@ -42,17 +42,29 @@ def process(records):
                     type_occur.append(TYPE)#将每个event中的type全部放入type_occur中
         type_occur = list(set(type_occur))#type_occur去除重复的元素
 
-        if len(type_occur) == 0:
-            data_dict = {}
-            data_dict['id'] = data_id
-            data_dict['content'] = content
-            data_dict['occur'] = type_occur
-            data_dict['type'] = random.choice(TYPES)
-            data_dict['triggers'] = []
-            data_dict['index'] = 0
-            data_dict['args'] = []
-            data_new.append(data_dict)
-            continue
+        for TYPE in TYPES:
+            if TYPE not in type_occur:
+                data_dict = {}
+                data_dict['id'] = data_id
+                data_dict['content'] = content
+                data_dict['occur'] = type_occur
+                data_dict['type'] = TYPE
+                data_dict['triggers'] = []
+                data_dict['index'] = 0
+                data_dict['args'] = []
+                data_new.append(data_dict)
+
+        # if len(type_occur) == 0:
+        #     data_dict = {}
+        #     data_dict['id'] = data_id
+        #     data_dict['content'] = content
+        #     data_dict['occur'] = type_occur
+        #     data_dict['type'] = random.choice(TYPES)
+        #     data_dict['triggers'] = []
+        #     data_dict['index'] = 0
+        #     data_dict['args'] = []
+        #     data_new.append(data_dict)
+        #     continue
 
         # label triggers and arguments
         for TYPE in TYPES:

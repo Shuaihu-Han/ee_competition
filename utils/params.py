@@ -44,7 +44,7 @@ def parse_args():
     parser.add_argument('--fp16_opt_level', type=str, default='O1', help="For fp16: Apex AMP optimization level selected in ['O0', 'O1', 'O2', and 'O3']." "See details at https://nvidia.github.io/apex/amp.html")
 
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
-    parser.add_argument("--lr_bert", type=float, default=2e-10, help="Learning rate for BERT.")
+    parser.add_argument("--lr_bert", type=float, default=2e-5, help="Learning rate for BERT.")
     # parser.add_argument("--lr_task", type=float, default=1e-4, help="Learning rate for task layers.")
     parser.add_argument("--lr_type", type=float, default=4e-5, help="Learning rate for task layers.")
     parser.add_argument("--lr_trigger", type=float, default=6e-5, help="Learning rate for task layers.")
@@ -59,8 +59,8 @@ def parse_args():
     parser.add_argument("--decoder_dropout", type=float, default=0.3, help="Dropout on decoders")
 
     # Model options.
-    parser.add_argument("--w1", type=float, default=25.0)
-    parser.add_argument("--w2", type=float, default=5.0)
+    parser.add_argument("--w1", type=float, default=1.0)
+    parser.add_argument("--w2", type=float, default=1.0)
     parser.add_argument("--w3", type=float, default=1.0)
     parser.add_argument("--pow_0", type=int, default=1)
     parser.add_argument("--pow_1", type=int, default=1)
