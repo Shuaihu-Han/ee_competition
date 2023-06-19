@@ -12,7 +12,7 @@ from utils.predict_without_oracle import extract_all_items_without_oracle
 from utils.predict_with_oracle import predict_one
 from tqdm import tqdm
 from utils.metric import score, gen_idx_event_dict, cal_scores, cal_scores_ti_tc_ai_ac
-from utils.utils_io_data import read_jsonl, write_jsonl
+from utils.utils_io_data import read_jsonl, write_jsonl, cas_print
 
 
 class Framework(object):
@@ -63,7 +63,7 @@ class Framework(object):
 
         return scheduler, optimizer
 
-    def train(self, train_loader, dev_loader):
+    def train(self, train_loader, dev_loader, logFile = None):
         scheduler, optimizer = self.set_learning_setting(self.config, train_loader, dev_loader, self.model)
         # going to train
         total_loss = 0.0
@@ -102,8 +102,8 @@ class Framework(object):
                 ae_loss += args_loss.item()
 
                 if (i + 1) % self.config.report_steps == 0:
-                    print("Epoch id: {}, Training steps: {}, ED loss:{:.6f},TE loss:{:.6f}, AE loss:{:.6f},  Avg loss: {:.6f}".format(epoch, i + 1, ed_loss / self.config.report_steps, te_loss / self.config.report_steps, ae_loss / self.config.report_steps,
-                                                                                                                                      total_loss / self.config.report_steps))
+                    cas_print("Epoch id: {}, Training steps: {}, ED loss:{:.6f},TE loss:{:.6f}, AE loss:{:.6f},  Avg loss: {:.6f}".format(epoch, i + 1, ed_loss / self.config.report_steps, te_loss / self.config.report_steps, ae_loss / self.config.report_steps,
+                                                                                                                                      total_loss / self.config.report_steps), logFile)
                     total_loss = 0.0
                     ed_loss = 0.0
                     te_loss = 0.0
@@ -116,20 +116,20 @@ class Framework(object):
                 optimizer.step()
                 scheduler.step()
 
-            print('Evaluating...')
+            cas_print('Evaluating...', logFile)
             c_ps, c_rs, c_fs, t_ps, t_rs, t_fs, a_ps, a_rs, a_fs = self.evaluate_with_oracle(self.config, self.model, dev_loader, self.config.device, self.config.ty_args_id, self.config.id_type)
             f1_mean_all = (t_fs + a_fs) / 2
-            print('Evaluate on all types:')
-            print("Epoch id: {}, Type P: {:.3f}, Type R: {:.3f}, Type F: {:.3f}".format(epoch, c_ps, c_rs, c_fs))
-            print("Epoch id: {}, Trigger P: {:.3f}, Trigger R: {:.3f}, Trigger F: {:.3f}".format(epoch, t_ps, t_rs, t_fs))
-            print("Epoch id: {}, Args P: {:.3f}, Args R: {:.3f}, Args F: {:.3f}".format(epoch, a_ps, a_rs, a_fs))
-            print("Epoch id: {}, F1 Mean All: {:.3f}".format(epoch, f1_mean_all))
+            cas_print('Evaluate on all types:', logFile)
+            cas_print("Epoch id: {}, Type P: {:.3f}, Type R: {:.3f}, Type F: {:.3f}".format(epoch, c_ps, c_rs, c_fs), logFile)
+            cas_print("Epoch id: {}, Trigger P: {:.3f}, Trigger R: {:.3f}, Trigger F: {:.3f}".format(epoch, t_ps, t_rs, t_fs), logFile)
+            cas_print("Epoch id: {}, Args P: {:.3f}, Args R: {:.3f}, Args F: {:.3f}".format(epoch, a_ps, a_rs, a_fs), logFile)
+            cas_print("Epoch id: {}, F1 Mean All: {:.3f}".format(epoch, f1_mean_all), logFile)
 
             if f1_mean_all > best_f1:
                 best_f1 = f1_mean_all
                 best_epoch = epoch
                 save_model(self.model, self.config.output_model_path)
-            print("The Best F1 Is: {:.3f}, When Epoch Is: {}".format(best_f1, best_epoch))
+            cas_print("The Best F1 Is: {:.3f}, When Epoch Is: {}".format(best_f1, best_epoch), logFile)
 
             # if epoch % 10 == 0:
             #     save_model(self.model, self.config.output_model_path)

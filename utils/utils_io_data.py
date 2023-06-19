@@ -26,3 +26,9 @@ def write_jsonl(data, fn):
         for line in data:
             line = json.dumps(line, ensure_ascii=False)
             f.write(line + '\n')
+
+
+def cas_print(s, f):
+    print(s)
+    if f:
+        print(s, file=f)
