@@ -1,34 +1,6 @@
 from models.layers import *
 
 
-# class TypeCls(nn.Module):
-#     def __init__(self, config, tokenizer=None, bert = None):
-#         super(TypeCls, self).__init__()
-#         self.type_emb = None
-#         self.register_buffer('type_indices', torch.arange(0, config.type_num, 1).long())
-#         self.dropout = nn.Dropout(config.decoder_dropout)
-#         self.tokenizer = tokenizer
-#         self.bert = bert
-
-#         self.config = config
-#         self.Predictor = AdaptiveAdditionPredictor(config.hidden_size, dropout_rate=config.decoder_dropout)
-
-#         for key in self.config.ty_args:
-#             type_token = self.tokenizer(key, return_tensors='pt')
-#             if self.type_emb == None:
-#                 self.type_emb = self.bert(**type_token)[0].squeeze(0).squeeze(0)[1:-1].mean(0)
-#             else:
-#                 self.type_emb = torch.cat((self.type_emb, self.bert(**type_token)[0].squeeze(0)[1:-1].mean(0)), dim=0)
-
-#         self.type_emb = self.type_emb.reshape(config.type_num, -1) 
-#         self.type_emb = nn.Embedding(config.type_num, config.hidden_size,_weight=self.type_emb)
-
-#     def forward(self, text_rep, mask):
-#         type_emb = self.type_emb(self.type_indices)
-#         pred = self.Predictor(type_emb, text_rep, mask)  # [b, c]
-#         p_type = torch.sigmoid(pred)
-#         return p_type, type_emb
-
 class TypeCls(nn.Module):
     def __init__(self, config, tokenizer=None, bert = None):
         super(TypeCls, self).__init__()
@@ -50,13 +22,12 @@ class TypeCls(nn.Module):
 
         self.type_emb = self.type_emb.reshape(config.type_num, -1) 
         self.type_emb = nn.Embedding(config.type_num, config.hidden_size,_weight=self.type_emb)
-        self.p_type = torch.ones(config.batch_size, config.type_num, device=config.device)
 
     def forward(self, text_rep, mask):
         type_emb = self.type_emb(self.type_indices)
-        # pred = self.Predictor(type_emb, text_rep, mask)  # [b, c]
-        # p_type = torch.sigmoid(pred)
-        return self.p_type[:mask.shape[0]], type_emb
+        pred = self.Predictor(type_emb, text_rep, mask)  # [b, c]
+        p_type = torch.sigmoid(pred)
+        return p_type, type_emb
 
 
 class TriggerRec(nn.Module):
@@ -100,7 +71,6 @@ class TriggerRec(nn.Module):
         inp = self.dropout(inp)
         p_s = torch.sigmoid(self.head_cls(inp))  # [b, t, 1]
         p_e = torch.sigmoid(self.tail_cls(inp))  # [b, t, 1]
-        # return p_s, p_e, h_cln
         return p_s, p_e, text_emb
 
 
@@ -227,8 +197,7 @@ class CasEE(nn.Module):
         output_emb = outputs[0]
         p_type, type_emb = self.type_cls(output_emb, mask)
         p_type = p_type.pow(self.config.pow_0)
-        # p_type[p_type > self.config.threshold_0] = 1
-        # p_type[p_type <= self.config.threshold_0] = 0
+
         type_loss = self.loss_0(p_type, type_vec)
         type_loss = torch.sum(type_loss)
 
@@ -238,13 +207,7 @@ class CasEE(nn.Module):
         p_e = p_e.pow(self.config.pow_1)
         p_s = p_s.squeeze(-1)
         p_e = p_e.squeeze(-1)
-
-        # p_s[p_s > self.config.threshold_1] = 1
-        # p_s[p_s <= self.config.threshold_1] = 0
-
-        # p_e[p_e > self.config.threshold_1] = 1
-        # p_e[p_e <= self.config.threshold_1] = 0
-
+        
         trigger_loss_s = self.loss_1(p_s, trigger_s_vec)
         trigger_loss_e = self.loss_1(p_e, trigger_e_vec)
         mask_t = mask.float()  # [b, t]
@@ -254,12 +217,6 @@ class CasEE(nn.Module):
         p_s, p_e, type_soft_constrain = self.args_rec(text_rep_type, relative_pos, trigger_mask, mask, type_rep)
         p_s = p_s.pow(self.config.pow_2)
         p_e = p_e.pow(self.config.pow_2)
-
-        # p_s[p_s > self.config.threshold_2] = 1
-        # p_s[p_s <= self.config.threshold_2] = 0
-
-        # p_e[p_e > self.config.threshold_2] = 1
-        # p_e[p_e <= self.config.threshold_2] = 0
 
         args_loss_s = self.loss_2(p_s, args_s_vec.transpose(1, 2))  # [b, t, l]
         args_loss_e = self.loss_2(p_e, args_e_vec.transpose(1, 2))
@@ -273,8 +230,7 @@ class CasEE(nn.Module):
         type_loss = self.config.w1 * type_loss
         trigger_loss = self.config.w2 * trigger_loss
         args_loss = self.config.w3 * args_loss
-        # loss = type_loss + trigger_loss + args_loss
-        loss = trigger_loss + args_loss
+        loss = type_loss + trigger_loss + args_loss
         return loss, type_loss, trigger_loss, args_loss
 
     def plm(self, tokens, segment, mask):
