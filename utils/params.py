@@ -32,9 +32,10 @@ def parse_args():
     parser.add_argument("--do_test", default=True, type=str2bool)
 
     parser.add_argument("--output_result_path", type=str, default='models_save/results.json')
-    parser.add_argument("--output_model_path", default="./models_save/model.bin", type=str, help="Path of the output model.")
+    parser.add_argument("--output_model_path_trigger", default="./models_save/model_trigger.bin", type=str, help="Path of the output model.")
+    parser.add_argument("--output_model_path_arg", default="./models_save/model_arg.bin", type=str, help="Path of the output model.")
 
-    parser.add_argument("--model_name_or_path", default="bert-base-chinese", type=str, help="Path of the output model.")
+    parser.add_argument("--model_name_or_path", default="./plm", type=str, help="Path of the output model.")
     parser.add_argument("--cache_dir", default="./plm", type=str, help="Where do you want to store the pre-trained models downloaded")
     parser.add_argument("--do_lower_case", action="store_true", help="")
     parser.add_argument("--seq_length", default=500, type=int, help="Sequence length.")

@@ -39,10 +39,10 @@ def main():
 
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES[config.model_type]
-    config_plm = config_class.from_pretrained(config.model_name_or_path, cache_dir=config.cache_dir if config.cache_dir else None)
+    config_plm = config_class.from_pretrained(config.model_name_or_path)
     config.hidden_size = config_plm.hidden_size
-    tokenizer = tokenizer_class.from_pretrained(config.model_name_or_path, do_lower_case=config.do_lower_case, cache_dir=config.cache_dir if config.cache_dir else None)
-    model_weight = model_class.from_pretrained(config.model_name_or_path, from_tf=bool('.ckpt' in config.model_name_or_path), cache_dir=config.cache_dir if config.cache_dir else None)
+    tokenizer = tokenizer_class.from_pretrained(config.model_name_or_path)
+    model_weight = model_class.from_pretrained(config.model_name_or_path)
 
     model = CasEE(config, model_weight, pos_emb_size=config.rp_size, tokenizer = tokenizer)
     # for name,parameters in model.named_parameters():
@@ -114,6 +114,7 @@ def main():
             config.batch_size = 1
         framework.load_model(config.output_model_path)
         config.test_path = 'datasets/FewFC/data/test.json'
+        # config.test_path = 'datasets/FewFC/data/dev.json'
         dev_set = Data(task='eval_without_oracle', fn=config.test_path, tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_test)
         print("The number of testing instances:", len(dev_set))

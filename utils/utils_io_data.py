@@ -28,7 +28,7 @@ def write_jsonl(data, fn):
             f.write(line + '\n')
 
 
-def cas_print(s, f):
+def cas_print(s, f=None):
     print(s)
     if f:
         print(s, file=f)
