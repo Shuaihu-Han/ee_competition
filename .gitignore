@@ -1,3 +1,4 @@
 /models_save/*
 /plm/*
 *.pyc
+/logs/*

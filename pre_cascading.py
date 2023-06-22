@@ -54,17 +54,17 @@ def process(records):
         #         data_dict['args'] = []
         #         data_new.append(data_dict)
 
-        if len(type_occur) == 0:
-            data_dict = {}
-            data_dict['id'] = data_id
-            data_dict['content'] = content
-            data_dict['occur'] = type_occur
-            data_dict['type'] = random.choice(TYPES)
-            data_dict['triggers'] = []
-            data_dict['index'] = 0
-            data_dict['args'] = []
-            data_new.append(data_dict)
-            continue
+        # if len(type_occur) == 0:
+        #     data_dict = {}
+        #     data_dict['id'] = data_id
+        #     data_dict['content'] = content
+        #     data_dict['occur'] = type_occur
+        #     data_dict['type'] = random.choice(TYPES)
+        #     data_dict['triggers'] = []
+        #     data_dict['index'] = 0
+        #     data_dict['args'] = []
+        #     data_new.append(data_dict)
+        #     continue
 
         # label triggers and arguments
         for TYPE in TYPES:

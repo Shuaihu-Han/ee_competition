@@ -12,24 +12,26 @@ from utils.predict_without_oracle import extract_all_items_without_oracle
 from utils.predict_with_oracle import predict_one
 from tqdm import tqdm
 from utils.metric import score, gen_idx_event_dict, cal_scores, cal_scores_ti_tc_ai_ac
-from utils.utils_io_data import read_jsonl, write_jsonl, cas_print
+from utils.utils_io_data import read_jsonl, write_jsonl, cas_print, get_fmean_all
 
 
 class Framework(object):
     def __init__(self, config, model):
         self.config = config
         self.model = model.to(config.device)
+        self.train_type = model.get_train_type()
 
     def load_model(self, model_path):
         self.model = load_model(self.model, model_path)
 
-    def set_learning_setting(self, config, train_loader, dev_loader, model):
+    def set_learning_setting(self, config, train_loader, dev_loader, model, logFile=None):
         instances_num = len(train_loader.dataset)
         train_steps = int(instances_num * config.epochs_num / config.batch_size) + 1
 
-        print("Batch size: ", config.batch_size)
-        print("The number of training instances:", instances_num)
-        print("The number of evaluating instances:", len(dev_loader.dataset))
+        # cas_print('Evaluating...', logFile)
+        cas_print(f"Batch size: {config.batch_size}", logFile)
+        cas_print(f"The number of training instances:{instances_num}", logFile)
+        cas_print(f"The number of evaluating instances:{len(dev_loader.dataset)}", logFile)
 
         bert_params = list(map(id, model.bert.parameters()))
         # type_params = list(map(id, model.type_cls.parameters()))
@@ -118,7 +120,7 @@ class Framework(object):
 
             cas_print('Evaluating...', logFile)
             c_ps, c_rs, c_fs, t_ps, t_rs, t_fs, a_ps, a_rs, a_fs = self.evaluate_with_oracle(self.config, self.model, dev_loader, self.config.device, self.config.ty_args_id, self.config.id_type)
-            f1_mean_all = (t_fs + a_fs) / 2
+            f1_mean_all = get_fmean_all(self.train_type, t_fs, a_fs)
             cas_print('Evaluate on all types:', logFile)
             cas_print("Epoch id: {}, Type P: {:.3f}, Type R: {:.3f}, Type F: {:.3f}".format(epoch, c_ps, c_rs, c_fs), logFile)
             cas_print("Epoch id: {}, Trigger P: {:.3f}, Trigger R: {:.3f}, Trigger F: {:.3f}".format(epoch, t_ps, t_rs, t_fs), logFile)
@@ -129,6 +131,9 @@ class Framework(object):
                 best_f1 = f1_mean_all
                 best_epoch = epoch
                 save_model(self.model, self.config.output_model_path)
+
+            if epoch % 10 == 0:
+                save_model(self.model, self.config.most_epoch_model_path)
             cas_print("The Best F1 Is: {:.3f}, When Epoch Is: {}".format(best_f1, best_epoch), logFile)
 
             # if epoch % 10 == 0:

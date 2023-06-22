@@ -32,6 +32,8 @@ def parse_args():
     parser.add_argument("--do_test", default=True, type=str2bool)
 
     parser.add_argument("--output_result_path", type=str, default='models_save/results.json')
+    parser.add_argument("--output_model_path", default="./models_save/model.bin", type=str, help="Path of the output model.")
+    parser.add_argument("--most_epoch_model_path", default="./models_save/most_epoch_model.bin", type=str, help="Path of the output model.")
     parser.add_argument("--output_model_path_trigger", default="./models_save/model_trigger.bin", type=str, help="Path of the output model.")
     parser.add_argument("--output_model_path_arg", default="./models_save/model_arg.bin", type=str, help="Path of the output model.")
 
@@ -47,15 +49,15 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=42, help="Random seed.")
     parser.add_argument("--lr_bert", type=float, default=2e-5, help="Learning rate for BERT.")
     # parser.add_argument("--lr_task", type=float, default=1e-4, help="Learning rate for task layers.")
-    parser.add_argument("--lr_type", type=float, default=4e-5, help="Learning rate for task layers.")
-    parser.add_argument("--lr_trigger", type=float, default=6e-5, help="Learning rate for task layers.")
+    parser.add_argument("--lr_type", type=float, default=1e-4, help="Learning rate for task layers.")
+    parser.add_argument("--lr_trigger", type=float, default=1e-4, help="Learning rate for task layers.")
     parser.add_argument("--lr_argument", type=float, default=1e-4, help="Learning rate for task layers.")
     parser.add_argument("--warmup", type=float, default=0.1, help="Warm up value.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch_size.")
     parser.add_argument("--epochs_num", type=int, default=50, help="Number of epochs.")
     parser.add_argument("--report_steps", type=int, default=200, help="Specific steps to print prompt.")
 
-    parser.add_argument("--weight_decay", type=float, default=1e-5, help="Weight decay value")
+    parser.add_argument("--weight_decay", type=float, default=0, help="Weight decay value")
     parser.add_argument("--dropout", type=float, default=0.1, help="Dropout on BERT")
     parser.add_argument("--decoder_dropout", type=float, default=0.3, help="Dropout on decoders")
 

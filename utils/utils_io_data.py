@@ -32,3 +32,8 @@ def cas_print(s, f=None):
     print(s)
     if f:
         print(s, file=f)
+
+def get_fmean_all(train_type, f_trigger, f_arg):
+    if train_type == 'arg':
+        return f_arg
+    return f_trigger

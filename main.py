@@ -4,7 +4,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 
 from utils.params import parse_args
-from models.model import CasEE
+from models.staged_model import CasEE
 from sklearn.metrics import *
 import transformers
 from transformers import *
@@ -13,12 +13,11 @@ from utils.data_loader import get_dict, collate_fn_dev, collate_fn_train, collat
 import torch
 import os
 from utils.metric import gen_idx_event_dict
-from utils.utils_io_data import read_jsonl, write_jsonl, cas_print
+from utils.utils_io_data import read_jsonl, write_jsonl, cas_print, get_fmean_all
 import datetime
 import shutil
 
 MODEL_CLASSES = {'bert': (BertConfig, BertModel, BertTokenizer), 'albert-zh': (AlbertConfig, AlbertModel, BertTokenizer), 'auto': (AutoConfig, AutoModel, AutoTokenizer)}
-
 
 def main():
     if not os.path.exists('plm'):
@@ -45,8 +44,9 @@ def main():
     model_weight = model_class.from_pretrained(config.model_name_or_path)
 
     model = CasEE(config, model_weight, pos_emb_size=config.rp_size, tokenizer = tokenizer)
-    # for name,parameters in model.named_parameters():
-    #     print(name,':',parameters.size())
+
+    only_generate = False
+    train_type = model.get_train_type()
 
     framework = Framework(config, model)
     
@@ -54,13 +54,11 @@ def main():
 
     log_folder = f'./logs/{nowTime}'
 
-    only_generate = False
-
     if not only_generate:
         config.do_train = True
         config.do_eval = True
-        config.do_test = True
-        config.generate_result = True
+        config.do_test = False
+        config.generate_result = False
 
         os.makedirs(log_folder)
         shutil.copy('./utils/params.py', log_folder)
@@ -86,7 +84,9 @@ def main():
         dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_dev)
         c_ps, c_rs, c_fs, t_ps, t_rs, t_fs, a_ps, a_rs, a_fs = framework.evaluate_with_oracle(config, model, dev_loader, config.device, config.ty_args_id, config.id_type)
-        f1_mean_all = (t_fs + a_fs) / 2
+
+        f1_mean_all = get_fmean_all(train_type, t_fs, a_fs)
+        # f1_mean_all = (t_fs + a_fs) / 2
         with open(os.path.join(log_folder, 'log.txt'), "a+", encoding='utf-8') as logFile:
             cas_print('Evaluate on all types:', logFile)
             cas_print("Type P: {:.3f}, Type R: {:.3f}, Type F: {:.3f}".format(c_ps, c_rs, c_fs), logFile)

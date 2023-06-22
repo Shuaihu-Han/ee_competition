@@ -154,6 +154,7 @@ class CasEE(nn.Module):
         super(CasEE, self).__init__()
         self.bert = model_weight
         self.tokenizer = tokenizer
+        self.train_type = 'arg'
 
         self.config = config
         self.args_num = config.args_num
@@ -167,7 +168,10 @@ class CasEE(nn.Module):
         self.loss_0 = nn.BCELoss(reduction='none')
         self.loss_1 = nn.BCELoss(reduction='none')
         self.loss_2 = nn.BCELoss(reduction='none')
-
+        
+    def get_train_type(self):
+        return self.train_type
+    
     def forward(self, tokens, segment, mask, type_id, type_vec, trigger_s_vec, trigger_e_vec, relative_pos, trigger_mask, args_s_vec, args_e_vec, args_mask):
         '''
 
