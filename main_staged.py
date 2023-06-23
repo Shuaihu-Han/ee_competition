@@ -119,8 +119,8 @@ def main():
         if config.batch_size != 1:
             config.batch_size = 1
         framework.load_models(config.output_model_path_trigger, config.output_model_path_arg)
-        config.test_path = 'datasets/FewFC/data/test.json'
-        # config.test_path = 'datasets/FewFC/data/dev.json'
+        # config.test_path = 'datasets/FewFC/data/test.json'
+        config.test_path = 'datasets/FewFC/data/dev.json'
         dev_set = Data(task='eval_without_oracle', fn=config.test_path, tokenizer=tokenizer_trigger, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_test)
         print("The number of testing instances:", len(dev_set))

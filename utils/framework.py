@@ -42,10 +42,20 @@ class Framework(object):
         # arg_params = list(map(id, model.args_rec.parameters()))
         # other_params = filter(lambda p: id(p) not in bert_params, model.parameters())
 
-        optimizer_grouped_parameters = [{'params': model.bert.parameters(), 'lr': config.lr_bert}, 
+        if self.train_type == 'arg':
+            optimizer_grouped_parameters = [{'params': model.bert.parameters(), 'lr': config.lr_bert}, 
                                         {'params': type_params, 'lr': config.lr_type},
                                         {'params': trigger_params, 'lr': config.lr_trigger},
                                         {'params': arg_params, 'lr': config.lr_argument}]
+        else:
+            optimizer_grouped_parameters = [{'params': type_params, 'lr': config.lr_type},
+                                    {'params': trigger_params, 'lr': config.lr_trigger},
+                                    {'params': arg_params, 'lr': config.lr_argument}]
+
+        # optimizer_grouped_parameters = [{'params': model.bert.parameters(), 'lr': config.lr_bert}, 
+        #                                 {'params': type_params, 'lr': config.lr_type},
+        #                                 {'params': trigger_params, 'lr': config.lr_trigger},
+        #                                 {'params': arg_params, 'lr': config.lr_argument}]
         # optimizer_grouped_parameters = [{'params': model.bert.parameters(), 'lr': config.lr_bert}, 
         #                                 {'params': other_params, 'lr': config.lr_type}]
 

@@ -153,6 +153,9 @@ class CasEE(nn.Module):
     def __init__(self, config, model_weight, pos_emb_size, tokenizer=None):
         super(CasEE, self).__init__()
         self.bert = model_weight
+        for name, param in self.bert.named_parameters():
+            param.requires_grad = False
+
         self.tokenizer = tokenizer
         self.train_type = 'trigger'
 
