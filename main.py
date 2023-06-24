@@ -4,7 +4,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 
 from utils.params import parse_args
-from models.staged_model4args import CasEE
+from models.staged_model import CasEE
 from sklearn.metrics import *
 import transformers
 from transformers import *
