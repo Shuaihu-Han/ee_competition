@@ -72,7 +72,7 @@ def main():
     if config.do_train:
         train_set = Data(task='train', fn=config.data_path + '/cascading_sampled4trigger/train.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         train_loader = DataLoader(train_set, batch_size=config.batch_size, shuffle=True, collate_fn=collate_fn_train)
-        dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled4arg/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
+        dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled4trigger/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_dev)
 
         with open(os.path.join(log_folder, 'log.txt'), "a+", encoding='utf-8') as logFile:

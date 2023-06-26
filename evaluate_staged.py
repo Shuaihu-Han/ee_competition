@@ -44,7 +44,7 @@ def main():
     tokenizer_trigger = tokenizer_class.from_pretrained(config.model_name_or_path)
     model_weight_trigger = model_class.from_pretrained(config.model_name_or_path)
 
-    config_plm_arg = config_class.from_pretrained(config.model_name_or_path)
+    # config_plm_arg = config_class.from_pretrained(config.model_name_or_path)
     # config.hidden_size_arg = config_plm_arg.hidden_size
     tokenizer_arg = tokenizer_class.from_pretrained(config.model_name_or_path)
     model_weight_arg = model_class.from_pretrained(config.model_name_or_path)
