@@ -210,7 +210,7 @@ def generate_arg_files():
 
 
 def main():
-    process_trigger_files = True
+    process_trigger_files = False
     
     if process_trigger_files:
         generate_trigger_files()
