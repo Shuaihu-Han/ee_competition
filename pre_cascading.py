@@ -197,15 +197,15 @@ def generate_trigger_files():
 
 def generate_arg_files():
     train = load_data('./datasets/FewFC/data/train.json')
-    train = process4trigger(train)
+    train = process4arg(train)
     write(train, './datasets/FewFC/cascading_sampled4arg/train.json')
 
     dev = load_data('./datasets/FewFC/data/dev.json')
-    dev = process4trigger(dev)
+    dev = process4arg(dev)
     write(dev, './datasets/FewFC/cascading_sampled4arg/dev.json')
 
     test = load_data('./datasets/FewFC/data/test.json')
-    test = process4trigger(test)
+    test = process4arg(test)
     write(test, './datasets/FewFC/cascading_sampled4arg/test.json')
 
 
