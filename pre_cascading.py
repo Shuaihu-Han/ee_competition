@@ -90,17 +90,27 @@ def process4trigger(records):
                                 trigger_args[str(trigger)][arg_role].append(args_roled_span)
                 # according to trigger order, write json record
                 triggers_str = [str(trigger) for trigger in triggers]  # with order
-                for trigger_str in trigger_args:
-                    index = triggers_str.index(trigger_str)
-                    data_dict = {}
-                    data_dict['id'] = data_id
-                    data_dict['content'] = content
-                    data_dict['occur'] = type_occur
-                    data_dict['type'] = TYPE
-                    data_dict['triggers'] = triggers
-                    data_dict['index'] = index
-                    data_dict['args'] = trigger_args[trigger_str]
-                    data_new.append(data_dict)
+                # for trigger_str in trigger_args:
+                #     index = triggers_str.index(trigger_str)
+                #     data_dict = {}
+                #     data_dict['id'] = data_id
+                #     data_dict['content'] = content
+                #     data_dict['occur'] = type_occur
+                #     data_dict['type'] = TYPE
+                #     data_dict['triggers'] = triggers
+                #     data_dict['index'] = index
+                #     data_dict['args'] = trigger_args[trigger_str]
+                #     data_new.append(data_dict)
+
+                data_dict = {}
+                data_dict['id'] = data_id
+                data_dict['content'] = content
+                data_dict['occur'] = type_occur
+                data_dict['type'] = TYPE
+                data_dict['triggers'] = triggers
+                data_dict['index'] = 0
+                data_dict['args'] = []
+                data_new.append(data_dict)
     return data_new
 
 def process4arg(records):
@@ -210,7 +220,7 @@ def generate_arg_files():
 
 
 def main():
-    process_trigger_files = False
+    process_trigger_files = True
     
     if process_trigger_files:
         generate_trigger_files()

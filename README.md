@@ -1,10 +1,3 @@
-# CasEE
-Source code for ACL2021 finding paper: [*CasEE: A Joint Learning Framework with Cascade Decoding for Overlapping Event Extraction*](https://aclanthology.org/2021.findings-acl.14/).
-
-Event extraction (EE) is a crucial information extraction task that aims to extract event information in texts. This work studies the realistic event overlapping problem, where a word may serve as triggers with several types or arguments with different roles. To tackle the above issues, this work proposes a joint learning framework CasEE with cascade decoding for overlapping event extraction. Particularly, CasEE sequentially performs type detection, trigger extraction and argument extraction, where the overlapped targets are extracted separately conditioned on the specific former prediction. All the subtasks are jointly learned in a framework to capture dependencies among the subtasks. The evaluation demonstrates that CasEE achieves significant improvements on overlapping event extraction over previous competitive methods.
-
-
-
 # Requirements
 
 We conduct our experiments on the following environments:
@@ -19,12 +12,25 @@ transformers == 4.9.1
 
 # How to run
 
+1.训练trigger:
+
 ```
-python main.py
+python main4trigger.py
+```
+2.训练arg:
+
+```
+python main4arg.py
+```
+3.评估模型结果:
+
+```
+python evaluate_staged.py
 ```
 
-The hyper-parameters are recorded in ``/utils/params.py``. 
+The hyper-parameters are recorded in ``/utils/params4trigger.py`` for ``main4trigger.py`` and in ``/utils/params4arg.py`` for ``main4arg.py``. 
 We adopt ``bert-base-chinese`` as our pretrained language model. For extention, you could also try further hyper-parameters for even better performance.
+当前模型在``main4trigger``训练2个epoch以及``main4arg.py``训练10个epoch后, 可以达到47.4的准确率.
 
 # Citation
 
