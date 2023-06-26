@@ -4,10 +4,9 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 
 from utils.params import parse_args
-from models.staged_model4args import CasEE as CasEE_ARG
-from models.staged_model4trigger import CasEE as CasEE_TRIGGER
+from models.staged_model4args_origin import CasEE as CasEE_ARG
+from models.staged_model4trigger_origin import CasEE as CasEE_TRIGGER
 from sklearn.metrics import *
-import transformers
 from transformers import *
 from utils.framework4staged import Framework
 from utils.data_loader import get_dict, collate_fn_dev, collate_fn_train, collate_fn_test, Data
@@ -19,7 +18,6 @@ import datetime
 import shutil
 
 MODEL_CLASSES = {'bert': (BertConfig, BertModel, BertTokenizer), 'albert-zh': (AlbertConfig, AlbertModel, BertTokenizer), 'auto': (AutoConfig, AutoModel, AutoTokenizer)}
-
 
 def main():
     if not os.path.exists('plm'):

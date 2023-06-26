@@ -5,18 +5,18 @@ import os
 
 
 def get_dict(fn):
-    with open(fn + '/cascading_sampled/ty_args.json', 'r', encoding='utf-8') as f:
+    with open(fn + '/ty_args.json', 'r', encoding='utf-8') as f:
         ty_args = json.load(f)
-    if not os.path.exists(fn + '/cascading_sampled/shared_args_list.json'):
+    if not os.path.exists(fn + '/shared_args_list.json'):
         args_list = set()
         for ty in ty_args:
             for arg in ty_args[ty]:
                 args_list.add(arg)
         args_list = list(args_list)
-        with open(fn + '/cascading_sampled/shared_args_list.json', 'w', encoding='utf-8') as f:
+        with open(fn + '/shared_args_list.json', 'w', encoding='utf-8') as f:
             json.dump(args_list, f, ensure_ascii=False)
     else:
-        with open(fn + '/cascading_sampled/shared_args_list.json', 'r', encoding='utf-8') as f:
+        with open(fn + '/shared_args_list.json', 'r', encoding='utf-8') as f:
             args_list = json.load(f)
 
     args_s_id = {}

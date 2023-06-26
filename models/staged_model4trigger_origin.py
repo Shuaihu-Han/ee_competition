@@ -5,12 +5,12 @@ class TypeCls(nn.Module):
         super(TypeCls, self).__init__()
         self.type_emb = None
         self.register_buffer('type_indices', torch.arange(0, config.type_num, 1).long())
-        # self.dropout = nn.Dropout(config.decoder_dropout)
+        self.dropout = nn.Dropout(config.decoder_dropout)
         self.tokenizer = tokenizer
         self.bert = bert
 
         self.config = config
-        # self.Predictor = AdaptiveAdditionPredictor(config.hidden_size, dropout_rate=config.decoder_dropout)
+        self.Predictor = AdaptiveAdditionPredictor(config.hidden_size, dropout_rate=config.decoder_dropout)
 
         for key in self.config.ty_args:
             type_token = self.tokenizer(key, return_tensors='pt')

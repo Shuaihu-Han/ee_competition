@@ -140,10 +140,13 @@ class Framework(object):
             if f1_mean_all > best_f1:
                 best_f1 = f1_mean_all
                 best_epoch = epoch
-                save_model(self.model, self.config.output_model_path)
+                if self.train_type == 'arg':
+                    save_model(self.model, self.config.output_model_path_arg)
+                else:
+                    save_model(self.model, self.config.output_model_path_trigger)
 
-            if epoch % 10 == 0:
-                save_model(self.model, self.config.most_epoch_model_path)
+            # if epoch % 10 == 0:
+            #     save_model(self.model, self.config.most_epoch_model_path)
             cas_print("The Best F1 Is: {:.3f}, When Epoch Is: {}".format(best_f1, best_epoch), logFile)
 
             # if epoch % 10 == 0:

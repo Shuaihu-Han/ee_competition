@@ -3,10 +3,9 @@ from tqdm import tqdm
 
 from torch.utils.data import DataLoader
 
-from utils.params import parse_args
-from models.staged_model4args import CasEE
+from utils.params4arg import parse_args
+from models.staged_model4args_origin import CasEE
 from sklearn.metrics import *
-import transformers
 from transformers import *
 from utils.framework import Framework
 from utils.data_loader import get_dict, collate_fn_dev, collate_fn_train, collate_fn_test, Data
@@ -71,17 +70,17 @@ def main():
 
 
     if config.do_train:
-        train_set = Data(task='train', fn=config.data_path + '/cascading_sampled/train.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
+        train_set = Data(task='train', fn=config.data_path + '/cascading_sampled4arg/train.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         train_loader = DataLoader(train_set, batch_size=config.batch_size, shuffle=True, collate_fn=collate_fn_train)
-        dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
+        dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled4arg/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_dev)
 
         with open(os.path.join(log_folder, 'log.txt'), "a+", encoding='utf-8') as logFile:
             framework.train(train_loader, dev_loader, logFile=logFile)
 
     if config.do_eval:
-        framework.load_model(config.output_model_path)
-        dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
+        framework.load_model(config.output_model_path_arg)
+        dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled4arg/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_dev)
         c_ps, c_rs, c_fs, t_ps, t_rs, t_fs, a_ps, a_rs, a_fs = framework.evaluate_with_oracle(config, model, dev_loader, config.device, config.ty_args_id, config.id_type)
 
@@ -97,7 +96,7 @@ def main():
     if config.do_test:
         if config.batch_size != 1:
             config.batch_size = 1
-        framework.load_model(config.output_model_path)
+        framework.load_model(config.output_model_path_arg)
 
         config.test_path = 'datasets/FewFC/data/dev.json'
         dev_set = Data(task='eval_without_oracle', fn=config.test_path, tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
@@ -112,9 +111,9 @@ def main():
     if config.generate_result:
         if config.batch_size != 1:
             config.batch_size = 1
-        framework.load_model(config.output_model_path)
-        config.test_path = 'datasets/FewFC/data/test.json'
-        # config.test_path = 'datasets/FewFC/data/dev.json'
+        framework.load_model(config.output_model_path_arg)
+        #config.test_path = 'datasets/FewFC/data/test.json'
+        config.test_path = 'datasets/FewFC/data/dev.json'
         dev_set = Data(task='eval_without_oracle', fn=config.test_path, tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_test)
         print("The number of testing instances:", len(dev_set))
@@ -123,7 +122,7 @@ def main():
         for i, prf in enumerate(prf_s):
             print('{}: P:{:.1f}, R:{:.1f}, F:{:.1f}'.format(metric_names[i], prf[0] * 100, prf[1] * 100, prf[2] * 100))
 
-        write_jsonl(pred_records, config.output_result_path)
+        # write_jsonl(pred_records, config.output_result_path)
 
 if __name__ == '__main__':
     main()

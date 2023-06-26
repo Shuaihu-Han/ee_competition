@@ -18,11 +18,12 @@ class ConditionalLayerNorm(nn.Module):
 
         # nn.init.zeros_(self.gamma_dense.weight)
         # nn.init.zeros_(self.beta_dense.weight)
-
+        
         self.reshape = nn.Sequential(
             nn.Linear(hidden_size * 2, hidden_size * 1),
             nn.Tanh()
         )
+
 
     def forward(self, x, condition):
         '''
@@ -34,10 +35,13 @@ class ConditionalLayerNorm(nn.Module):
         # mean = x.mean(-1, keepdim=True)
         # std = x.std(-1, keepdim=True)
 
-        condition = condition.unsqueeze(1).expand_as(x)
+        # condition = condition.unsqueeze(1).expand_as(x)
         # gamma = self.gamma_dense(condition) + self.gamma
         # beta = self.beta_dense(condition) + self.beta
         # x = gamma * (x - mean) / (std + self.eps) + beta
+        # return x
+
+        condition = condition.unsqueeze(1).expand_as(x)
         return self.reshape(torch.cat([x, condition], dim=-1))
 
 
