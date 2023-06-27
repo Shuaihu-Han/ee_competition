@@ -54,7 +54,7 @@ def parse_args():
     parser.add_argument("--lr_argument", type=float, default=1e-4, help="Learning rate for task layers.")
     parser.add_argument("--warmup", type=float, default=0.1, help="Warm up value.")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch_size.")
-    parser.add_argument("--epochs_num", type=int, default=10, help="Number of epochs.")
+    parser.add_argument("--epochs_num", type=int, default=50, help="Number of epochs.")
     parser.add_argument("--report_steps", type=int, default=200, help="Specific steps to print prompt.")
 
     parser.add_argument("--weight_decay", type=float, default=0, help="Weight decay value")
