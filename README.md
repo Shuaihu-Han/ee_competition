@@ -7,7 +7,7 @@ python 3.6
 CUDA: 9.0
 GPU: Tesla T4
 pytorch == 1.1.0
-transformers == 4.9.1
+transformers == 4.23.1
 ```
 
 # How to run

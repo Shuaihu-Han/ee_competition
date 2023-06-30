@@ -8,7 +8,7 @@ from utils.utils_io_model import load_model, save_model
 import torch
 import numpy as np
 from sklearn.metrics import *
-from vote_utils.predict_without_oracle_staged4vote_split_vector import extract_all_items_without_oracle
+from vote_utils.predict_without_oracle_staged4vote_split_vector_mean import extract_all_items_without_oracle
 from utils.predict_with_oracle import predict_one
 from tqdm import tqdm
 from utils.metric import score, gen_idx_event_dict, cal_scores, cal_scores_ti_tc_ai_ac
