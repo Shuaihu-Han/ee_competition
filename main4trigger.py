@@ -33,14 +33,20 @@ def main():
     config.type_num = len(config.type_id.keys())
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     config.device = device
-    config.model_type = 'bert'
+    # config.model_type = 'bert'
+    config.model_type = 'auto'
 
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES[config.model_type]
-    config_plm = config_class.from_pretrained(config.model_name_or_path)
+    
+    # config_plm = config_class.from_pretrained(config.model_name_or_path)
+    # tokenizer = tokenizer_class.from_pretrained(config.model_name_or_path)
+    # model_weight = model_class.from_pretrained(config.model_name_or_path)
+    config_plm = config_class.from_pretrained(config.model_name_or_path, trust_remote_code=True)
+    tokenizer = tokenizer_class.from_pretrained(config.model_name_or_path, trust_remote_code=True)
+    model_weight = model_class.from_pretrained(config.model_name_or_path, trust_remote_code=True)
+
     config.hidden_size = config_plm.hidden_size
-    tokenizer = tokenizer_class.from_pretrained(config.model_name_or_path)
-    model_weight = model_class.from_pretrained(config.model_name_or_path)
 
     model = CasEE(config, model_weight, pos_emb_size=config.rp_size, tokenizer = tokenizer)
 
@@ -70,7 +76,7 @@ def main():
 
 
     if config.do_train:
-        train_set = Data(task='train', fn=config.data_path + '/cascading_sampled4trigger/train.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
+        train_set = Data(task='train', fn=config.data_path + '/cascading_sampled4trigger/trainAndDev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         train_loader = DataLoader(train_set, batch_size=config.batch_size, shuffle=True, collate_fn=collate_fn_train)
         dev_set = Data(task='eval_with_oracle', fn=config.data_path + '/cascading_sampled4trigger/dev.json', tokenizer=tokenizer, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_dev)

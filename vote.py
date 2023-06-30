@@ -34,19 +34,26 @@ def main():
     config.type_num = len(config.type_id.keys())
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     config.device = device
-    config.model_type = ['bert', 'bert', 'bert']
+    # config.model_type = ['bert', 'bert', 'bert']
+    config.model_type = ['auto', 'auto', 'auto']
     config.model_name_or_path = config.model_name_or_path.split(',')
     model_list = []
     for i in range(len(config.model_type)):
         config_class, model_class, tokenizer_class = MODEL_CLASSES[config.model_type[i]]
-        config_plm_trigger = config_class.from_pretrained(config.model_name_or_path[i])
+
+        config_plm_trigger = config_class.from_pretrained(config.model_name_or_path[i], trust_remote_code=True)
+        tokenizer_trigger = tokenizer_class.from_pretrained(config.model_name_or_path[i], trust_remote_code=True)
+        model_weight_trigger = model_class.from_pretrained(config.model_name_or_path[i], trust_remote_code=True)
+        tokenizer_arg = tokenizer_class.from_pretrained(config.model_name_or_path[i], trust_remote_code=True)
+        model_weight_arg = model_class.from_pretrained(config.model_name_or_path[i], trust_remote_code=True)
+
+        # config_plm_trigger = config_class.from_pretrained(config.model_name_or_path[i])
+        # tokenizer_trigger = tokenizer_class.from_pretrained(config.model_name_or_path[i])
+        # model_weight_trigger = model_class.from_pretrained(config.model_name_or_path[i])
+        # tokenizer_arg = tokenizer_class.from_pretrained(config.model_name_or_path[i])
+        # model_weight_arg = model_class.from_pretrained(config.model_name_or_path[i])
+
         config.hidden_size = config_plm_trigger.hidden_size
-        tokenizer_trigger = tokenizer_class.from_pretrained(config.model_name_or_path[i])
-        model_weight_trigger = model_class.from_pretrained(config.model_name_or_path[i])
-        # config_plm_arg = config_class.from_pretrained(config.model_name_or_path)
-        # config.hidden_size_arg = config_plm_arg.hidden_size
-        tokenizer_arg = tokenizer_class.from_pretrained(config.model_name_or_path[i])
-        model_weight_arg = model_class.from_pretrained(config.model_name_or_path[i])
         model_trigger = CasEE_TRIGGER(config, model_weight_trigger, pos_emb_size=config.rp_size, tokenizer = tokenizer_trigger)
         model_arg = CasEE_ARG(config, model_weight_arg, pos_emb_size=config.rp_size, tokenizer = tokenizer_arg)
         model_list.extend([model_trigger, model_arg])
@@ -119,8 +126,8 @@ def main():
         for trig,arg in zip(config.output_model_path_trigger.split(','), config.output_model_path_arg.split(',')):
             _paths.extend([trig, arg])
         framework.load_models(_paths)
-        # config.test_path = 'datasets/FewFC/data/test.json'
-        config.test_path = 'datasets/FewFC/data/dev.json'
+        config.test_path = 'datasets/FewFC/data/test.json'
+        #config.test_path = 'datasets/FewFC/data/dev.json'
         dev_set = Data(task='eval_without_oracle', fn=config.test_path, tokenizer=tokenizer_trigger, seq_len=config.seq_length, args_s_id=config.args_s_id, args_e_id=config.args_e_id, type_id=config.type_id)
         dev_loader = DataLoader(dev_set, batch_size=1, shuffle=False, collate_fn=collate_fn_test)
         print("The number of testing instances:", len(dev_set))
