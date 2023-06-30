@@ -60,7 +60,7 @@ def main():
         config.generate_result = False
 
         os.makedirs(log_folder)
-        shutil.copy('./utils/params.py', log_folder)
+        shutil.copy('./utils/params4trigger.py', log_folder)
     else:
         config.do_train = False
         config.do_eval = False
